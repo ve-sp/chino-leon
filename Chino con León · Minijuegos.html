@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Chino con León · Minijuegos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Noto+Sans+SC:wght@500;700&display=swap" rel="stylesheet">
+<style>
+/* =========================================================
+   1. COLORES Y TIPOGRAFÍA (tokens)
+   ========================================================= */
+:root {
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  color-scheme: light;
+
+  --font: 'Baloo 2', 'Nunito', 'Trebuchet MS', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --zh: 'Noto Sans SC', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Heiti SC', sans-serif;
+
+  --bg: #e9f4f2;
+  --bg-dot: #d5ebe6;
+  --paper: #ffffff;
+  --ink: #3a2e4d;
+  --ink-soft: #6f6382;
+  --line: #d9cfe6;
+  --grid: #f3b9b9;
+
+  --pink: #ffd3e0;   --pink-deep: #e98aa6;
+  --lemon: #fff0b3;  --lemon-deep: #e2b437;
+  --sky: #cfe6ff;    --sky-deep: #6fa6dc;
+  --mint: #c8eed8;   --mint-deep: #4fb985;
+  --lilac: #e2d8ff;  --lilac-deep: #9b86e0;
+  --peach: #ffd9c2;
+
+  --ok: #2fa56b;     --ok-bg: #d6f5e4;
+  --bad: #e25c5c;    --bad-bg: #ffe0e0;
+  --lion: #f59f3a;   --lion-deep: #d9801c;
+  --on-lion: #ffffff;
+  --press: rgba(58, 46, 77, .14);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #1d2128;  --bg-dot: #262b34;
+    --paper: #2a2f3a; --ink: #f3eefb; --ink-soft: #b9b0c9; --line: #434a59; --grid: #7a4a52;
+    --pink: #4d2e3b;  --pink-deep: #f0a0b8;
+    --lemon: #4a4128; --lemon-deep: #f0cc64;
+    --sky: #26384d;   --sky-deep: #8fbdf0;
+    --mint: #234338;  --mint-deep: #6fd3a2;
+    --lilac: #352d52; --lilac-deep: #b6a5f0;
+    --peach: #4b3427;
+    --ok: #5fd69a; --ok-bg: #1f4334; --bad: #ff8a8a; --bad-bg: #4b2626;
+    --lion: #f6a94e; --lion-deep: #c97716; --on-lion: #2a1a05;
+    --press: rgba(0, 0, 0, .35);
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #1d2128;  --bg-dot: #262b34;
+  --paper: #2a2f3a; --ink: #f3eefb; --ink-soft: #b9b0c9; --line: #434a59; --grid: #7a4a52;
+  --pink: #4d2e3b;  --pink-deep: #f0a0b8;
+  --lemon: #4a4128; --lemon-deep: #f0cc64;
+  --sky: #26384d;   --sky-deep: #8fbdf0;
+  --mint: #234338;  --mint-deep: #6fd3a2;
+  --lilac: #352d52; --lilac-deep: #b6a5f0;
+  --peach: #4b3427;
+  --ok: #5fd69a; --ok-bg: #1f4334; --bad: #ff8a8a; --bad-bg: #4b2626;
+  --lion: #f6a94e; --lion-deep: #c97716; --on-lion: #2a1a05;
+  --press: rgba(0, 0, 0, .35);
+}
+
+/* =========================================================
+   2. BASE
+   ========================================================= */
+html { scroll-padding-top: env(safe-area-inset-top, 0px); -webkit-text-size-adjust: 100%; }
+*, *::before, *::after { box-sizing: inherit; }
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: var(--font);
+  font-size: 1.125rem;
+  line-height: 1.4;
+  color: var(--ink);
+  background-color: var(--bg);
+  background-image: radial-gradient(var(--bg-dot) 2px, transparent 2.5px);
+  background-size: 26px 26px;
+}
+button { font: inherit; color: inherit; }
+img, svg { max-width: 100%; }
+#app { max-width: 1100px; margin: 0 auto; padding: 20px 18px 40px; }
+:focus-visible { outline: 4px solid var(--sky-deep); outline-offset: 3px; border-radius: 14px; }
+
+.zh { font-family: var(--zh); font-weight: 700; letter-spacing: .02em; }
+.py { display: block; font-family: var(--font); font-weight: 600; font-size: .62em; color: var(--ink-soft); letter-spacing: 0; line-height: 1.1; margin-top: .15em; }
+body.no-pinyin .py { display: none; }
+.zhb { display: inline-flex; flex-direction: column; align-items: center; }
+.emo { font-size: 1.5em; line-height: 1; }
+
+/* Botones */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: .4em;
+  min-height: 56px; padding: 10px 26px;
+  border: 0; border-radius: 999px; cursor: pointer;
+  font-weight: 800; font-size: 1.2rem;
+  background: var(--lion); color: var(--on-lion);
+  box-shadow: 0 5px 0 var(--lion-deep);
+  transition: transform .08s, box-shadow .08s;
+}
+.btn:active { transform: translateY(4px); box-shadow: 0 1px 0 var(--lion-deep); }
+.btn-soft { background: var(--paper); color: var(--ink); box-shadow: 0 5px 0 var(--line); }
+.btn-soft:active { box-shadow: 0 1px 0 var(--line); }
+.btn-small { min-height: 46px; font-size: 1.05rem; padding: 6px 18px; }
+
+.chip {
+  border: 2px solid var(--line); background: var(--paper); color: var(--ink);
+  border-radius: 999px; padding: 6px 14px; min-height: 44px; cursor: pointer; font-weight: 700; font-size: 1rem;
+}
+.chip[aria-pressed="true"] { border-color: var(--mint-deep); background: var(--mint); }
+
+/* =========================================================
+   3. PANTALLA DE INICIO
+   ========================================================= */
+.hero { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; margin: 6px 0 22px; }
+.hero .mascot { width: 104px; height: 104px; flex: none; animation: bob 3.2s ease-in-out infinite; }
+.hero-text { flex: 1 1 280px; }
+.hero h1 { margin: 0; font-size: clamp(2.2rem, 5vw, 3.2rem); line-height: 1; font-weight: 800; }
+.hero h1 .zh-title { font-family: var(--zh); font-size: .7em; color: var(--lion-deep); margin-left: .25em; }
+.hero p { margin: 6px 0 0; color: var(--ink-soft); font-size: 1.2rem; }
+.hero .chip { align-self: flex-start; }
+
+.game-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }
+.game-card {
+  position: relative; display: flex; flex-direction: column; gap: 6px;
+  background: var(--tint); border-radius: 30px 30px 30px 10px;
+  padding: 18px 20px 20px; border: 3px solid transparent;
+}
+.game-card:nth-child(even) { border-radius: 30px 30px 10px 30px; }
+.game-card .art {
+  background: var(--paper); border-radius: 22px; height: 118px;
+  display: grid; place-items: center; margin-bottom: 6px;
+}
+.game-card .art svg { width: 150px; height: 100px; }
+.game-card h2 { margin: 0; font-size: 1.5rem; line-height: 1.1; }
+.game-card p { margin: 0 0 8px; color: var(--ink-soft); font-size: 1.05rem; flex: 1; }
+.game-card .bottom { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.stars { font-size: 1.4rem; letter-spacing: 2px; color: var(--lion); white-space: nowrap; }
+.stars .off { color: var(--line); }
+.game-card .stars { font-size: 1.15rem; }
+.foot { margin-top: 26px; text-align: center; color: var(--ink-soft); font-size: 1rem; }
+
+/* =========================================================
+   4. PANTALLA DE JUEGO
+   ========================================================= */
+.topbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.topbar h2 { margin: 0; flex: 1 1 200px; font-size: clamp(1.5rem, 3.5vw, 2rem); line-height: 1.1; }
+.instr { margin: 10px 0 12px; font-size: 1.2rem; color: var(--ink-soft); }
+.progress { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
+.progress-track { flex: 1; height: 18px; background: var(--paper); border-radius: 999px; border: 3px solid var(--line); overflow: hidden; }
+.progress-fill { height: 100%; width: 0; background: var(--tint-deep); border-radius: 999px; transition: width .4s ease; }
+.progress-text { font-weight: 800; font-size: 1.15rem; min-width: 4.2em; text-align: right; }
+
+.stage { min-height: 300px; }
+.feedback { min-height: 64px; margin-top: 18px; display: flex; justify-content: center; }
+.feedback .msg {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 8px 22px 8px 10px; border-radius: 999px; font-weight: 800; font-size: 1.3rem;
+  animation: pop .35s ease;
+}
+.feedback .msg svg { width: 46px; height: 46px; }
+.feedback .good { background: var(--ok-bg); color: var(--ok); }
+.feedback .bad { background: var(--bad-bg); color: var(--bad); }
+
+/* Tarjetas de opciones */
+.opt, .pcard, .tile {
+  border: 3px solid var(--line); background: var(--paper); color: var(--ink);
+  border-radius: 20px; cursor: pointer;
+  box-shadow: 0 5px 0 var(--line);
+  transition: transform .08s, box-shadow .08s, background-color .2s, border-color .2s, opacity .2s;
+  -webkit-tap-highlight-color: transparent;
+}
+.opt:active:not(:disabled), .pcard:active:not(:disabled), .tile:active:not(:disabled) { transform: translateY(4px); box-shadow: 0 1px 0 var(--line); }
+.ok { background: var(--ok-bg) !important; border-color: var(--ok) !important; box-shadow: 0 5px 0 var(--ok) !important; }
+.bad { background: var(--bad-bg) !important; border-color: var(--bad) !important; box-shadow: 0 5px 0 var(--bad) !important; }
+.dim { opacity: .4; }
+.opt:disabled { cursor: default; }
+
+.options { display: grid; gap: 16px; }
+.options.col3 { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
+.options.col4 { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: 640px; margin: 0 auto; }
+.es-opt { min-height: 92px; padding: 12px 16px; font-size: 1.45rem; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 10px; text-align: center; }
+.zh-opt { min-height: 130px; padding: 12px; font-size: 2.4rem; display: grid; place-items: center; }
+
+/* Tarjeta grande con cuadrícula de escritura (田字格) */
+.tianzi {
+  position: relative; background: var(--paper); border-radius: 28px; border: 3px solid var(--line);
+  padding: 24px 30px; margin: 0 auto 22px; max-width: 520px; text-align: center;
+}
+.tianzi .word {
+  position: relative; display: inline-flex; flex-direction: column; align-items: center;
+  font-size: clamp(3.4rem, 11vw, 5.5rem); line-height: 1.15; padding: 6px 22px;
+}
+.tianzi .word::before {
+  content: ""; position: absolute; inset: 0 0 auto 0; height: calc(1.15em + 12px);
+  border: 2px solid var(--grid); border-radius: 6px;
+  background:
+    linear-gradient(var(--grid), var(--grid)) center / 100% 0 no-repeat,
+    repeating-linear-gradient(90deg, var(--grid) 0 6px, transparent 6px 12px) center / 100% 2px no-repeat,
+    repeating-linear-gradient(0deg, var(--grid) 0 6px, transparent 6px 12px) center / 2px 100% no-repeat;
+  opacity: .75; z-index: 0;
+}
+.tianzi .word > * { position: relative; z-index: 1; }
+.tianzi .word .py { font-size: .32em; margin-top: .35em; }
+.tianzi.es-prompt .word { font-family: var(--font); font-size: clamp(2.2rem, 7vw, 3.4rem); font-weight: 800; flex-direction: row; gap: 14px; }
+.tianzi.es-prompt .word::before { display: none; }
+.speak {
+  display: none; position: absolute; top: 12px; right: 12px; width: 54px; height: 54px;
+  border-radius: 50%; border: 3px solid var(--line); background: var(--paper); cursor: pointer; font-size: 1.5rem;
+}
+body.has-voice .speak { display: grid; place-items: center; }
+
+/* Juego 1: parejas */
+.pairs { display: grid; grid-template-columns: 1fr 1fr; gap: 18px 26px; max-width: 820px; margin: 0 auto; }
+.pairs-col { display: flex; flex-direction: column; gap: 14px; }
+.pcard { min-height: 84px; padding: 10px 14px; display: flex; align-items: center; justify-content: center; gap: 10px; text-align: center; }
+.pcard.zh-side { font-size: 2rem; }
+.pcard.es-side { font-size: 1.3rem; font-weight: 700; }
+.pcard.sel { border-color: var(--sky-deep); background: var(--sky); box-shadow: 0 5px 0 var(--sky-deep); transform: translateY(-3px); }
+.pcard.matched { cursor: default; }
+
+/* Juegos 2 y 4: oraciones */
+.tiles { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; margin-bottom: 22px; }
+.tile { min-width: 84px; min-height: 84px; padding: 8px 16px; font-size: 2rem; display: inline-grid; place-items: center; touch-action: manipulation; }
+.tile[draggable="true"] { cursor: grab; }
+.sentence-card { background: var(--paper); border: 3px solid var(--line); border-radius: 28px; padding: 22px 18px; max-width: 760px; margin: 0 auto; text-align: center; }
+.sentence { display: flex; flex-wrap: wrap; justify-content: center; align-items: flex-start; gap: 6px 10px; font-size: clamp(2rem, 6vw, 2.8rem); }
+.token { display: inline-flex; flex-direction: column; align-items: center; }
+.punct { font-family: var(--zh); font-weight: 700; align-self: flex-start; }
+.slot {
+  display: inline-flex; flex-direction: column; align-items: center; justify-content: center;
+  min-width: 2.2em; min-height: 1.6em; padding: 0 .2em;
+  border: 3px dashed var(--tint-deep); border-radius: 16px; background: var(--tint);
+}
+.slot.over { transform: scale(1.06); }
+.slot.filled { border-style: solid; }
+.hint { margin: 16px 0 0; font-size: 1.3rem; color: var(--ink-soft); }
+.hint strong { color: var(--ink); font-weight: 800; }
+.hint.lead { margin: 0 0 16px; font-size: clamp(1.4rem, 4vw, 1.9rem); color: var(--ink); font-weight: 800; }
+
+.dialog { display: flex; flex-direction: column; gap: 14px; max-width: 520px; margin: 0 auto; }
+.bubble { display: flex; align-items: flex-end; gap: 10px; }
+.bubble.right { justify-content: flex-end; }
+.bubble .who { font-size: 2.4rem; line-height: 1; }
+.bubble-body { background: var(--tint); border-radius: 24px; padding: 12px 20px; font-size: clamp(2rem, 6vw, 2.6rem); }
+.bubble.left .bubble-body { border-bottom-left-radius: 6px; background: var(--sky); }
+.bubble.right .bubble-body { border-bottom-right-radius: 6px; background: transparent; padding: 0; }
+
+.order-line {
+  display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 12px;
+  min-height: 116px; padding: 14px; border-radius: 22px;
+  border: 3px dashed var(--tint-deep); background: var(--tint);
+}
+.order-line .placeholder { color: var(--ink-soft); font-size: 1.15rem; }
+.order-line .punct { font-size: 2rem; align-self: center; }
+.bank { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; margin: 22px 0 10px; min-height: 92px; }
+.row-actions { display: flex; justify-content: center; margin-top: 8px; }
+
+/* Pantalla final */
+.end { max-width: 620px; margin: 10px auto; background: var(--paper); border-radius: 34px; border: 3px solid var(--line); padding: 26px 24px 28px; text-align: center; }
+.end .mascot { width: 130px; height: 130px; margin: 0 auto; animation: bob 2s ease-in-out infinite; }
+.end h2 { margin: 6px 0 2px; font-size: 2.4rem; }
+.end .stars { font-size: 2.6rem; margin: 4px 0; }
+.end .score { font-size: 1.5rem; margin: 4px 0; }
+.end .score b { font-size: 1.3em; color: var(--lion-deep); }
+.end .note { color: var(--ink-soft); margin: 4px 0 18px; }
+.end .review { text-align: left; background: var(--bg); border-radius: 20px; padding: 12px 16px; margin: 0 0 20px; }
+.end .review h3 { margin: 0 0 8px; font-size: 1.15rem; }
+.end .review ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.end .review li { background: var(--paper); border-radius: 14px; padding: 6px 12px; display: flex; align-items: center; gap: 8px; font-size: 1.05rem; }
+.end .review li .zh { font-size: 1.4rem; }
+.end-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; }
+
+/* Animaciones */
+@keyframes pop { 0% { transform: scale(.7); opacity: 0; } 70% { transform: scale(1.08); opacity: 1; } 100% { transform: scale(1); } }
+@keyframes shake { 0%,100% { transform: translateX(0); } 20% { transform: translateX(-9px); } 40% { transform: translateX(8px); } 60% { transform: translateX(-6px); } 80% { transform: translateX(4px); } }
+@keyframes bob { 0%,100% { transform: translateY(0) rotate(-2deg); } 50% { transform: translateY(-6px) rotate(2deg); } }
+@keyframes fall { to { transform: translate(var(--dx), 110vh) rotate(720deg); } }
+.pop { animation: pop .4s ease; }
+.shake { animation: shake .45s ease; }
+.confetti { position: fixed; top: -20px; width: 12px; height: 16px; border-radius: 4px; z-index: 50; pointer-events: none; animation: fall linear forwards; }
+
+@media (max-width: 560px) {
+  #app { padding: 14px 12px 32px; }
+  .pairs { gap: 12px; }
+  .pcard.zh-side { font-size: 1.6rem; }
+  .pcard.es-side { font-size: 1.05rem; }
+  .tile { min-width: 70px; min-height: 74px; font-size: 1.7rem; }
+  .zh-opt { font-size: 2rem; min-height: 110px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+  .confetti { display: none; }
+}
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+/* =========================================================
+   1. VOCABULARIO DEL MAZO "Clase León"
+   (única fuente de contenido; para editar, cambiar solo aquí)
+   particle: true  → palabras gramaticales que no se usan en los
+                     juegos de traducción, solo dentro de oraciones.
+   ========================================================= */
+const VOCAB = [
+  { zh: '我', py: 'wǒ', es: 'yo', emoji: '🙋' },
+  { zh: '你', py: 'nǐ', es: 'vos', emoji: '👉' },
+  { zh: '他', py: 'tā', es: 'él', emoji: '👦' },
+  { zh: '她', py: 'tā', es: 'ella', emoji: '👧' },
+  { zh: '很', py: 'hěn', es: 'muy' },
+  { zh: '好', py: 'hǎo', es: 'bien / bueno', emoji: '👍' },
+  { zh: '不', py: 'bù', es: 'no', emoji: '🚫' },
+  { zh: '是', py: 'shì', es: 'ser' },
+  { zh: '有', py: 'yǒu', es: 'tener' },
+  { zh: '吗', py: 'ma', es: 'partícula para preguntas de sí o no', particle: true },
+  { zh: '什么', py: 'shénme', es: 'qué', emoji: '❓' },
+  { zh: '的', py: 'de', es: 'posesivo (你的 = tuyo)', particle: true },
+  { zh: '你好', py: 'nǐ hǎo', es: 'hola', emoji: '😃' },
+  { zh: '再见', py: 'zàijiàn', es: 'chau / adiós', emoji: '👋' },
+  { zh: '谢谢', py: 'xièxie', es: 'gracias', emoji: '🙏' },
+  { zh: '不客气', py: 'bú kèqi', es: 'de nada', emoji: '😊' },
+  { zh: '对不起', py: 'duìbuqǐ', es: 'perdón', emoji: '😔' },
+  { zh: '没关系', py: 'méi guānxi', es: 'no pasa nada', emoji: '👌' },
+  { zh: '你好吗？', py: 'Nǐ hǎo ma?', es: '¿Cómo estás?' },
+  { zh: '我很好。', py: 'Wǒ hěn hǎo.', es: 'Estoy muy bien.', emoji: '😄' },
+  { zh: '妈妈', py: 'māma', es: 'mamá', emoji: '👩' },
+  { zh: '爸爸', py: 'bàba', es: 'papá', emoji: '👨' },
+  { zh: '朋友', py: 'péngyou', es: 'amigo / amiga', emoji: '🤝' },
+  { zh: '老师', py: 'lǎoshī', es: 'maestro / maestra', emoji: '🧑‍🏫' },
+  { zh: '叫', py: 'jiào', es: 'llamarse', emoji: '🏷️' },
+  { zh: '你呢？', py: 'Nǐ ne?', es: '¿Y vos?' },
+  { zh: '哥哥', py: 'gēge', es: 'hermano mayor' },
+  { zh: '姐姐', py: 'jiějie', es: 'hermana mayor' },
+  { zh: '学生', py: 'xuésheng', es: 'estudiante', emoji: '🎒' },
+  { zh: '们', py: 'men', es: 'plural (我们 = nosotros)', particle: true },
+  { zh: '没', py: 'méi', es: 'no, en pasado (没有 = no tener)', particle: true },
+  { zh: '家', py: 'jiā', es: 'casa', emoji: '🏠' },
+  { zh: '学校', py: 'xuéxiào', es: 'colegio', emoji: '🏫' },
+  { zh: '公园', py: 'gōngyuán', es: 'parque', emoji: '🌳' },
+  { zh: '商店', py: 'shāngdiàn', es: 'tienda', emoji: '🏪' },
+  { zh: '饭店', py: 'fàndiàn', es: 'restaurante', emoji: '🍜' },
+  { zh: '医院', py: 'yīyuàn', es: 'hospital', emoji: '🏥' },
+  { zh: '机场', py: 'jīchǎng', es: 'aeropuerto', emoji: '✈️' },
+  { zh: '门', py: 'mén', es: 'puerta', emoji: '🚪' },
+];
+
+/* Combinaciones que el mazo enseña explícitamente (们 → 我们, 的 → 你的, 没 → 没有) */
+const COMBOS = { '我的': 'wǒ de', '你的': 'nǐ de', '我们': 'wǒmen', '他们': 'tāmen', '没有': 'méiyǒu' };
+
+/* =========================================================
+   2. ORACIONES (solo con vocabulario y estructuras del mazo)
+   Estructuras usadas: A 是 B · A 不 是 B · A 有 B · A 没有 B ·
+   A 很 好 · …吗？ · 我的/你的 · 我们/他们 · 你好吗？我很好，你呢？
+   ========================================================= */
+
+/* Juego 4: ordenar. Ningún token se repite dentro de una oración. */
+const SENTENCES = [
+  { tokens: ['我', '是', '学生'], end: '。', es: 'Yo soy estudiante.' },
+  { tokens: ['他', '是', '老师'], end: '。', es: 'Él es maestro.' },
+  { tokens: ['她', '是', '我的', '妈妈'], end: '。', es: 'Ella es mi mamá.' },
+  { tokens: ['他', '是', '我的', '爸爸'], end: '。', es: 'Él es mi papá.' },
+  { tokens: ['你', '是', '老师', '吗'], end: '？', es: '¿Vos sos maestro?' },
+  { tokens: ['我', '不', '是', '老师'], end: '。', es: 'Yo no soy maestro.' },
+  { tokens: ['我', '有', '朋友'], end: '。', es: 'Yo tengo amigos.' },
+  { tokens: ['我', '没有', '哥哥'], end: '。', es: 'Yo no tengo hermano mayor.' },
+  { tokens: ['你', '有', '姐姐', '吗'], end: '？', es: '¿Vos tenés hermana mayor?' },
+  { tokens: ['她', '很', '好'], end: '。', es: 'Ella está muy bien.' },
+  { tokens: ['我们', '是', '朋友'], end: '。', es: 'Nosotros somos amigos.' },
+  { tokens: ['他们', '是', '学生'], end: '。', es: 'Ellos son estudiantes.' },
+  { tokens: ['我的', '姐姐', '是', '学生'], end: '。', es: 'Mi hermana mayor es estudiante.' },
+  { tokens: ['我', '有', '哥哥'], end: '。', es: 'Yo tengo hermano mayor.' },
+  { tokens: ['她', '是', '老师', '吗'], end: '？', es: '¿Ella es maestra?' },
+  { tokens: ['你', '好', '吗'], end: '？', es: '¿Cómo estás?' },
+];
+
+/* Juego 2: completar. null = hueco. Los distractores se eligieron para que
+   ninguno forme otra oración correcta. dialog = completar una respuesta. */
+const FILL = [
+  { parts: ['我', null, '学生'], end: '。', answer: '是', opts: ['是', '很', '吗'], es: 'Yo soy estudiante.' },
+  { parts: ['他', '是', null], end: '。', answer: '老师', opts: ['老师', '学生', '妈妈'], es: 'Él es maestro.' },
+  { parts: ['她', '是', '我的', null], end: '。', answer: '妈妈', opts: ['妈妈', '爸爸', '哥哥'], es: 'Ella es mi mamá.' },
+  { parts: ['你', '是', '老师', null], end: '？', answer: '吗', opts: ['吗', '很', '的'], es: '¿Vos sos maestro?' },
+  { parts: ['我', null, '是', '老师'], end: '。', answer: '不', opts: ['不', '很', '有'], es: 'Yo no soy maestro.' },
+  { parts: ['我', null, '朋友'], end: '。', answer: '有', opts: ['有', '很', '吗'], es: 'Yo tengo amigos.' },
+  { parts: ['我', null, '有', '哥哥'], end: '。', answer: '没', opts: ['没', '不', '很'], es: 'Yo no tengo hermano mayor.' },
+  { parts: ['你', '有', null, '吗'], end: '？', answer: '姐姐', opts: ['姐姐', '哥哥', '老师'], es: '¿Vos tenés hermana mayor?' },
+  { parts: ['她', null, '好'], end: '。', answer: '很', opts: ['很', '是', '吗'], es: 'Ella está muy bien.' },
+  { parts: ['我', null, '是', '朋友'], end: '。', answer: '们', opts: ['们', '的', '吗'], es: 'Nosotros somos amigos.' },
+  { parts: ['他', '是', '我', null, '爸爸'], end: '。', answer: '的', opts: ['的', '很', '吗'], es: 'Él es mi papá.' },
+  { parts: ['你', null, '吗'], end: '？', answer: '好', opts: ['好', '很', '的'], es: '¿Cómo estás?' },
+  { parts: ['我', '很', '好', '，', null], end: '？', answer: '你呢', opts: ['你呢', '再见', '谢谢'], es: 'Estoy muy bien, ¿y vos?' },
+  { dialog: '谢谢！', answer: '不客气', opts: ['不客气', '没关系', '再见'], es: '—Gracias. —De nada.' },
+  { dialog: '对不起！', answer: '没关系', opts: ['没关系', '不客气', '你好'], es: '—Perdón. —No pasa nada.' },
+  { dialog: '你好！', answer: '你好', opts: ['你好', '再见', '对不起'], es: '—Hola. —Hola.' },
+  { dialog: '再见！', answer: '再见', opts: ['再见', '你好', '谢谢'], es: '—Chau. —Chau.' },
+  { dialog: '你好吗？', answer: '我很好', opts: ['我很好', '不客气', '对不起'], es: '—¿Cómo estás? —Estoy muy bien.' },
+];
+
+/* =========================================================
+   3. UTILIDADES
+   ========================================================= */
+const POOL = VOCAB.filter(w => !w.particle);           // palabras para juegos de traducción
+const strip = s => s.replace(/[，。？！、?!.,]/g, '');
+const isPunct = s => /^[，。？！、]$/.test(s);
+const PY_MAP = {};
+VOCAB.forEach(w => { PY_MAP[strip(w.zh)] = w.py.replace(/[?.!]/g, ''); });
+Object.assign(PY_MAP, COMBOS);
+const PY = s => PY_MAP[strip(s)] || '';
+
+/* Pinyin en contexto: 不 se pronuncia bú antes de un 4.º tono (不是 = bú shì) */
+function sentencePinyin(tokens) {
+  return tokens.map((t, i) => {
+    if (isPunct(t)) return '';
+    if (t === '不' && tokens[i + 1]) {
+      const m = PY(tokens[i + 1]).match(/[āáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ]/);
+      if (m && 'àèìòùǜ'.includes(m[0])) return 'bú';
+    }
+    return PY(t);
+  });
+}
+
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+  return a;
+}
+const sample = (arr, n) => shuffle(arr).slice(0, n);
+const zhBlock = (zh, py) => `<span class="zhb"><span class="zh">${zh}</span>${py ? `<span class="py">${py}</span>` : ''}</span>`;
+const esBlock = w => `${w.emoji ? `<span class="emo" aria-hidden="true">${w.emoji}</span>` : ''}<span>${w.es}</span>`;
+
+/* Distractores: evita palabras que se contienen entre sí (好 / 你好 / 我很好)
+   para que no haya respuestas confusas. */
+function related(a, b) { const A = strip(a.zh), B = strip(b.zh); return A.includes(B) || B.includes(A); }
+function distractors(ans, n) {
+  const ok = POOL.filter(w => w !== ans && !related(w, ans));
+  const isPhrase = w => /[？。]/.test(w.zh);
+  const same = shuffle(ok.filter(w => isPhrase(w) === isPhrase(ans)));
+  const rest = shuffle(ok.filter(w => isPhrase(w) !== isPhrase(ans)));
+  return same.concat(rest).slice(0, n);
+}
+
+const store = {
+  get(k, d) { try { const v = localStorage.getItem('chino-leon:' + k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem('chino-leon:' + k, JSON.stringify(v)); } catch (e) {} },
+};
+
+/* Voz en chino (si el dispositivo tiene una) */
+let zhVoice = null;
+function loadVoices() {
+  if (!('speechSynthesis' in window)) return;
+  const v = speechSynthesis.getVoices();
+  zhVoice = v.find(x => /^zh[-_]CN/i.test(x.lang)) || v.find(x => /^zh/i.test(x.lang)) || null;
+  document.body.classList.toggle('has-voice', !!zhVoice);
+}
+if ('speechSynthesis' in window) { loadVoices(); speechSynthesis.onvoiceschanged = loadVoices; }
+function speak(text) {
+  if (!zhVoice) return;
+  const u = new SpeechSynthesisUtterance(strip(text));
+  u.lang = zhVoice.lang; u.voice = zhVoice; u.rate = .8;
+  speechSynthesis.cancel(); speechSynthesis.speak(u);
+}
+
+/* =========================================================
+   4. DIBUJOS
+   ========================================================= */
+function lion(happy) {
+  let mane = '';
+  for (let i = 0; i < 14; i++) {
+    const a = i / 14 * Math.PI * 2, x = 50 + Math.cos(a) * 34, y = 52 + Math.sin(a) * 34;
+    mane += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="13" fill="${i % 2 ? '#f59f3a' : '#f7b452'}"/>`;
+  }
+  const mouth = happy
+    ? '<path d="M42 66 Q50 78 58 66 Z" fill="#8a3f33"/><path d="M45 70 Q50 75 55 70" fill="#ff8f8f"/>'
+    : '<path d="M43 66 Q50 72 57 66" stroke="#8a3f33" stroke-width="2.6" fill="none" stroke-linecap="round"/>';
+  return `<svg viewBox="0 0 100 104" role="img" aria-label="León">
+    ${mane}<circle cx="50" cy="52" r="34" fill="#f59f3a"/>
+    <circle cx="29" cy="29" r="9" fill="#ffd88a"/><circle cx="29" cy="29" r="4.5" fill="#f6b39a"/>
+    <circle cx="71" cy="29" r="9" fill="#ffd88a"/><circle cx="71" cy="29" r="4.5" fill="#f6b39a"/>
+    <circle cx="50" cy="54" r="27" fill="#ffd88a"/>
+    <circle cx="40" cy="48" r="4.2" fill="#3a2e4d"/><circle cx="41.3" cy="46.6" r="1.3" fill="#fff"/>
+    <circle cx="60" cy="48" r="4.2" fill="#3a2e4d"/><circle cx="61.3" cy="46.6" r="1.3" fill="#fff"/>
+    <circle cx="33" cy="58" r="4.5" fill="#ffab9e" opacity=".75"/><circle cx="67" cy="58" r="4.5" fill="#ffab9e" opacity=".75"/>
+    <ellipse cx="50" cy="62" rx="12" ry="9" fill="#fff3d6"/>
+    <path d="M46 57 h8 q0 4.5 -4 5.5 q-4 -1 -4 -5.5 z" fill="#8a4b3a"/>
+    ${mouth}
+  </svg>`;
+}
+const T = (x, y, s, t, f) => `<text x="${x}" y="${y}" font-size="${s}" text-anchor="middle" font-family="${f || "'Noto Sans SC','PingFang SC',sans-serif"}" font-weight="700" fill="#3a2e4d">${t}</text>`;
+const ICONS = {
+  parejas: `<svg viewBox="0 0 150 100" aria-hidden="true">
+    <rect x="10" y="18" width="48" height="64" rx="14" fill="#ffe8ef" stroke="#e98aa6" stroke-width="3"/>${T(34, 60, 28, '你')}
+    <rect x="92" y="18" width="48" height="64" rx="14" fill="#ffe8ef" stroke="#e98aa6" stroke-width="3"/>${T(116, 57, 16, 'vos', "'Baloo 2',sans-serif")}
+    <path d="M60 50 H90" stroke="#e98aa6" stroke-width="4" stroke-linecap="round" stroke-dasharray="1 8"/>
+    <circle cx="75" cy="50" r="11" fill="#2fa56b"/><path d="M69.5 50 l4 4 l7 -8" stroke="#fff" stroke-width="3.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  completar: `<svg viewBox="0 0 150 100" aria-hidden="true">
+    <rect x="57" y="4" width="36" height="32" rx="10" fill="#ffe27a" stroke="#e2b437" stroke-width="3"/>${T(75, 28, 20, '是')}
+    <path d="M70 42 l5 6 l5 -6" stroke="#e2b437" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="10" y="56" width="38" height="36" rx="10" fill="#fff" stroke="#c9b98a" stroke-width="3"/>${T(29, 81, 20, '我')}
+    <rect x="56" y="56" width="38" height="36" rx="10" fill="#fff8d6" stroke="#e2b437" stroke-width="3" stroke-dasharray="6 5"/>
+    <rect x="102" y="56" width="38" height="36" rx="10" fill="#fff" stroke="#c9b98a" stroke-width="3"/>${T(121, 81, 15, '学生')}</svg>`,
+  elegir: `<svg viewBox="0 0 150 100" aria-hidden="true">
+    <rect x="45" y="4" width="60" height="50" rx="12" fill="#fff" stroke="#6fa6dc" stroke-width="3"/>
+    <path d="M75 8 V50 M49 29 H101" stroke="#f3b9b9" stroke-width="1.5" stroke-dasharray="3 3"/>${T(75, 41, 30, '家')}
+    <rect x="6" y="66" width="40" height="28" rx="14" fill="#e7f2ff" stroke="#6fa6dc" stroke-width="3"/>
+    <rect x="55" y="66" width="40" height="28" rx="14" fill="#2fa56b"/>${T(75, 85, 13, 'casa', "'Baloo 2',sans-serif").replace('#3a2e4d', '#fff')}
+    <rect x="104" y="66" width="40" height="28" rx="14" fill="#e7f2ff" stroke="#6fa6dc" stroke-width="3"/></svg>`,
+  ordenar: `<svg viewBox="0 0 150 100" aria-hidden="true">
+    <rect x="8" y="58" width="40" height="36" rx="10" fill="#fff" stroke="#4fb985" stroke-width="3"/>${T(28, 83, 20, '我')}
+    <rect x="55" y="34" width="40" height="36" rx="10" fill="#fff" stroke="#4fb985" stroke-width="3"/>${T(75, 59, 20, '是')}
+    <rect x="102" y="8" width="40" height="36" rx="10" fill="#fff" stroke="#4fb985" stroke-width="3"/>${T(122, 31, 14, '学生')}
+    <path d="M30 50 Q40 30 52 40" stroke="#4fb985" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <path d="M78 26 Q88 6 99 16" stroke="#4fb985" stroke-width="3" fill="none" stroke-linecap="round"/></svg>`,
+  encontrar: `<svg viewBox="0 0 150 100" aria-hidden="true">
+    <rect x="8" y="8" width="38" height="38" rx="10" fill="#fff" stroke="#9b86e0" stroke-width="3"/>${T(27, 34, 20, '门')}
+    <rect x="52" y="8" width="38" height="38" rx="10" fill="#fff" stroke="#9b86e0" stroke-width="3"/>${T(71, 34, 20, '家')}
+    <rect x="8" y="54" width="38" height="38" rx="10" fill="#fff" stroke="#9b86e0" stroke-width="3"/>${T(27, 80, 20, '她')}
+    <rect x="52" y="54" width="38" height="38" rx="10" fill="#fff" stroke="#9b86e0" stroke-width="3"/>${T(71, 80, 20, '叫')}
+    <circle cx="104" cy="52" r="24" fill="rgba(255,255,255,.65)" stroke="#6c56c0" stroke-width="6"/>
+    <path d="M121 69 L140 88" stroke="#6c56c0" stroke-width="9" stroke-linecap="round"/></svg>`,
+};
+
+/* =========================================================
+   5. NAVEGACIÓN Y PIEZAS COMUNES
+   ========================================================= */
+const $app = document.getElementById('app');
+let roundId = 0;                    // invalida temporizadores al cambiar de pantalla
+let pinyinOn = store.get('pinyin', true);
+document.body.classList.toggle('no-pinyin', !pinyinOn);
+
+const pinyinChip = () => `<button class="chip" data-pinyin-toggle aria-pressed="${pinyinOn}">Pinyin: ${pinyinOn ? 'sí' : 'no'}</button>`;
+
+document.addEventListener('click', e => {
+  if (e.target.closest('[data-pinyin-toggle]')) {
+    pinyinOn = !pinyinOn; store.set('pinyin', pinyinOn);
+    document.body.classList.toggle('no-pinyin', !pinyinOn);
+    document.querySelectorAll('[data-pinyin-toggle]').forEach(b => { b.setAttribute('aria-pressed', pinyinOn); b.textContent = 'Pinyin: ' + (pinyinOn ? 'sí' : 'no'); });
+  }
+  const sp = e.target.closest('[data-speak]');
+  if (sp) speak(sp.dataset.speak);
+  if (e.target.closest('[data-home]')) showHome();
+});
+
+const starsHTML = n => `<span class="stars" aria-label="${n} de 3 estrellas">${[1, 2, 3].map(i => `<span class="${i <= n ? '' : 'off'}">★</span>`).join('')}</span>`;
+
+function gameShell(game) {
+  $app.innerHTML = `
+  <div class="game" style="--tint:var(--${game.color});--tint-deep:var(--${game.color}-deep)">
+    <div class="topbar">
+      <button class="btn btn-soft btn-small" data-home>← Menú</button>
+      <h2>${game.name}</h2>
+      ${pinyinChip()}
+    </div>
+    <p class="instr">${game.instr}</p>
+    <div class="progress"><div class="progress-track"><div class="progress-fill"></div></div><span class="progress-text"></span></div>
+    <section class="stage"></section>
+    <div class="feedback" aria-live="polite"></div>
+  </div>`;
+  window.scrollTo(0, 0);
+  const fill = $app.querySelector('.progress-fill'), ptxt = $app.querySelector('.progress-text'), fb = $app.querySelector('.feedback');
+  const GOOD = ['¡Muy bien!', '¡Genial!', '¡Excelente!', '¡Bravo!', '¡Así se hace!', '¡Perfecto!'];
+  const BAD = ['Casi… ¡probá otra vez!', '¡Uy! Intentá de nuevo', 'Esa no es. ¡Seguí probando!'];
+  return {
+    stage: $app.querySelector('.stage'),
+    progress(done, total) { fill.style.width = (done / total * 100) + '%'; ptxt.textContent = `${done} / ${total}`; },
+    good() { fb.innerHTML = `<span class="msg good">${lion(true)}${GOOD[Math.floor(Math.random() * GOOD.length)]}</span>`; },
+    bad(text) { fb.innerHTML = `<span class="msg bad">${text || BAD[Math.floor(Math.random() * BAD.length)]}</span>`; },
+    clear() { fb.innerHTML = ''; },
+  };
+}
+
+/* Opciones de una sola respuesta: el error se marca y se puede volver a intentar */
+function bindOptions(stage, opts, isRight, ctx, onRight) {
+  let done = false;
+  stage.querySelectorAll('.opt').forEach(b => b.addEventListener('click', () => {
+    if (done || b.disabled) return;
+    const o = opts[+b.dataset.i];
+    if (isRight(o)) {
+      done = true; b.classList.add('ok', 'pop');
+      stage.querySelectorAll('.opt').forEach(x => { if (x !== b) { x.classList.add('dim'); x.disabled = true; } });
+      if (onRight) onRight(o, b);
+      ctx.right();
+    } else {
+      b.classList.remove('shake'); void b.offsetWidth; b.classList.add('bad', 'shake'); b.disabled = true;
+      ctx.wrong();
+    }
+  }));
+}
+
+/* Motor común de los juegos 2 a 5 */
+function runRound(game, items, isReview) {
+  const id = ++roundId, ui = gameShell(game), total = items.length, missed = [];
+  let idx = 0, score = 0;
+  function next() {
+    if (id !== roundId) return;
+    if (idx >= total) return showEnd(game, score, total, missed, isReview);
+    ui.progress(idx, total); ui.clear();
+    const q = items[idx]; let firstTry = true, answered = false;
+    ui.stage.innerHTML = '';
+    game.render(q, ui.stage, {
+      wrong(msg) { if (firstTry) { firstTry = false; missed.push(q); } ui.bad(msg); },
+      right() {
+        if (answered) return; answered = true;
+        if (firstTry) score++;
+        idx++; ui.progress(idx, total); ui.good();
+        setTimeout(next, 1300);
+      },
+    });
+  }
+  next();
+}
+
+function startGame(game, items, isReview) {
+  if (game.id === 'parejas') return playPairs(game, items, isReview);
+  runRound(game, items || game.makeRound(), isReview);
+}
+
+/* =========================================================
+   6. LOS CINCO JUEGOS
+   ========================================================= */
+
+/* Juego 1 · Unir parejas */
+function playPairs(game, items, isReview) {
+  const id = ++roundId, ui = gameShell(game);
+  let words = items ? items.slice() : sample(POOL, 6);
+  if (words.length < 4) words = words.concat(sample(POOL.filter(w => !words.includes(w)), 4 - words.length));
+  const total = words.length, missedIds = new Set();
+  let found = 0, busy = false, first = null;
+  const sel = { zh: null, es: null };
+  const L = shuffle(words), R = shuffle(words);
+  ui.stage.innerHTML = `<div class="pairs">
+    <div class="pairs-col">${L.map(w => `<button class="pcard zh-side" data-id="${w.zh}">${zhBlock(w.zh, w.py)}</button>`).join('')}</div>
+    <div class="pairs-col">${R.map(w => `<button class="pcard es-side" data-id="${w.zh}">${esBlock(w)}</button>`).join('')}</div>
+  </div>`;
+  ui.progress(0, total);
+  ui.stage.querySelectorAll('.pcard').forEach(b => b.addEventListener('click', () => {
+    if (busy || b.classList.contains('matched')) return;
+    const side = b.classList.contains('zh-side') ? 'zh' : 'es', other = side === 'zh' ? 'es' : 'zh';
+    if (sel[side] === b) { b.classList.remove('sel'); sel[side] = null; if (first === side) first = sel[other] ? other : null; return; }
+    if (sel[side]) sel[side].classList.remove('sel');
+    sel[side] = b; b.classList.add('sel');
+    if (!sel[other]) { first = side; if (side === 'zh') speak(b.dataset.id); return; }
+    const a = sel.zh, c = sel.es;
+    if (a.dataset.id === c.dataset.id) {
+      [a, c].forEach(x => { x.classList.remove('sel'); x.classList.add('ok', 'matched', 'pop'); x.disabled = true; });
+      sel.zh = sel.es = null; found++;
+      ui.progress(found, total); ui.good();
+      if (found === total) setTimeout(() => {
+        if (id !== roundId) return;
+        const missed = words.filter(w => missedIds.has(w.zh));
+        showEnd(game, total - missed.length, total, missed, isReview);
+      }, 1100);
+    } else {
+      busy = true; missedIds.add(sel[first].dataset.id);
+      [a, c].forEach(x => { x.classList.remove('sel'); x.classList.add('bad', 'shake'); });
+      ui.bad();
+      setTimeout(() => { [a, c].forEach(x => x.classList.remove('bad', 'shake')); sel.zh = sel.es = null; busy = false; }, 750);
+    }
+  }));
+}
+
+/* Juego 2 · Completar la oración */
+function renderFill(item, stage, ctx) {
+  const opts = shuffle(item.opts);
+  let sentence, slotPy;
+  if (item.dialog) {
+    slotPy = PY(item.answer);
+    sentence = `<div class="dialog">
+      <div class="bubble left"><span class="who" aria-hidden="true">🧒</span><div class="bubble-body">${zhBlock(item.dialog, PY(item.dialog))}</div></div>
+      <div class="bubble right"><div class="bubble-body"><span class="slot" data-slot aria-label="hueco"></span></div><span class="who" aria-hidden="true">🦁</span></div>
+    </div>`;
+  } else {
+    const full = item.parts.map(p => p === null ? item.answer : p), pys = sentencePinyin(full);
+    slotPy = pys[item.parts.indexOf(null)];
+    sentence = `<div class="sentence">${item.parts.map((p, i) =>
+      p === null ? `<span class="slot" data-slot aria-label="hueco"></span>`
+        : isPunct(p) ? `<span class="punct">${p}</span>`
+          : `<span class="token">${zhBlock(p, pys[i])}</span>`).join('')}<span class="punct">${item.end}</span></div>`;
+  }
+  stage.innerHTML = `
+    <div class="tiles">${opts.map((o, i) => `<button class="opt tile" draggable="true" data-i="${i}">${zhBlock(o, PY(o))}</button>`).join('')}</div>
+    <div class="sentence-card">${sentence}<p class="hint">En español: <strong>${item.es}</strong></p></div>`;
+  const slot = stage.querySelector('[data-slot]');
+  bindOptions(stage, opts, o => o === item.answer, ctx, o => {
+    slot.innerHTML = zhBlock(o, slotPy); slot.classList.add('filled', 'ok', 'pop');
+  });
+  stage.querySelectorAll('.tile').forEach(b => b.addEventListener('dragstart', e => e.dataTransfer.setData('text/plain', b.dataset.i)));
+  slot.addEventListener('dragover', e => { e.preventDefault(); slot.classList.add('over'); });
+  slot.addEventListener('dragleave', () => slot.classList.remove('over'));
+  slot.addEventListener('drop', e => {
+    e.preventDefault(); slot.classList.remove('over');
+    const b = stage.querySelector(`.opt[data-i="${e.dataTransfer.getData('text/plain')}"]`);
+    if (b) b.click();
+  });
+}
+
+/* Juego 3 · Elegir la traducción */
+function renderChoose(item, stage, ctx) {
+  const opts = shuffle([item, ...distractors(item, 2)]);
+  stage.innerHTML = `
+    <div class="tianzi pop">
+      <span class="word">${zhBlock(item.zh, item.py)}</span>
+      <button class="speak" data-speak="${item.zh}" aria-label="Escuchar">🔊</button>
+    </div>
+    <div class="options col3">${opts.map((o, i) => `<button class="opt es-opt" data-i="${i}">${esBlock(o)}</button>`).join('')}</div>`;
+  bindOptions(stage, opts, o => o === item, ctx);
+}
+
+/* Juego 4 · Ordenar la oración */
+function renderOrder(item, stage, ctx) {
+  const pys = sentencePinyin(item.tokens);
+  const tiles = item.tokens.map((t, i) => ({ t, py: pys[i], i }));
+  let bankOrder = shuffle(tiles);
+  while (item.tokens.length > 1 && bankOrder.every((x, k) => x.i === k)) bankOrder = shuffle(tiles);
+  let line = [], bad = new Set(), done = false;
+  stage.innerHTML = `
+    <div class="sentence-card">
+      <p class="hint lead">${item.es}</p>
+      <div class="order-line" data-line></div>
+    </div>
+    <div class="bank" data-bank></div>
+    <div class="row-actions"><button class="btn btn-soft btn-small" data-clear>↺ Empezar de nuevo</button></div>`;
+  const lineEl = stage.querySelector('[data-line]'), bankEl = stage.querySelector('[data-bank]');
+  const tileHTML = (x, cls) => `<button class="tile ${cls}" data-i="${x.i}" ${done ? 'disabled' : ''}>${zhBlock(x.t, x.py)}</button>`;
+  function draw() {
+    lineEl.innerHTML = line.length
+      ? line.map((x, k) => tileHTML(x, done ? 'ok' : bad.has(k) ? 'bad' : '')).join('') + (done ? `<span class="punct">${item.end}</span>` : '')
+      : '<span class="placeholder">Tocá las palabras de abajo en orden</span>';
+    bankEl.innerHTML = bankOrder.filter(x => !line.includes(x)).map(x => tileHTML(x, '')).join('');
+  }
+  function check() {
+    if (line.every((x, k) => x.i === k)) { done = true; draw(); lineEl.classList.add('pop'); ctx.right(); return; }
+    bad = new Set(line.map((x, k) => x.i !== k ? k : -1).filter(k => k >= 0));
+    draw(); lineEl.classList.remove('shake'); void lineEl.offsetWidth; lineEl.classList.add('shake');
+    ctx.wrong('Casi… tocá las palabras rojas para sacarlas');
+  }
+  lineEl.addEventListener('click', e => {
+    const b = e.target.closest('.tile'); if (!b || done) return;
+    line = line.filter(x => x.i !== +b.dataset.i); bad = new Set(); draw();
+  });
+  bankEl.addEventListener('click', e => {
+    const b = e.target.closest('.tile'); if (!b || done) return;
+    line.push(tiles[+b.dataset.i]); bad = new Set(); draw();
+    if (line.length === tiles.length) check();
+  });
+  stage.querySelector('[data-clear]').addEventListener('click', () => { if (done) return; line = []; bad = new Set(); draw(); });
+  draw();
+}
+
+/* Juego 5 · Encontrar la palabra */
+function renderFind(item, stage, ctx) {
+  const opts = shuffle([item, ...distractors(item, 3)]);
+  stage.innerHTML = `
+    <div class="tianzi es-prompt pop"><span class="word">${esBlock(item)}</span></div>
+    <div class="options col4">${opts.map((o, i) => `<button class="opt zh-opt" data-i="${i}">${zhBlock(o.zh, o.py)}</button>`).join('')}</div>`;
+  bindOptions(stage, opts, o => o === item, ctx, o => speak(o.zh));
+}
+
+const GAMES = [
+  { id: 'parejas', name: 'Unir parejas', color: 'pink', desc: 'Uní cada palabra en chino con lo que significa.',
+    instr: 'Tocá una palabra en chino y después su significado en español.' },
+  { id: 'completar', name: 'Completar la oración', color: 'lemon', desc: 'Encontrá la palabra que falta.',
+    instr: 'Elegí la palabra que falta. También podés arrastrarla al hueco.', render: renderFill, makeRound: () => sample(FILL, 8) },
+  { id: 'elegir', name: 'Elegir la traducción', color: 'sky', desc: 'Mirá la palabra y elegí qué significa.',
+    instr: '¿Qué significa esta palabra? Tocá la respuesta correcta.', render: renderChoose, makeRound: () => sample(POOL, 8) },
+  { id: 'ordenar', name: 'Ordenar la oración', color: 'mint', desc: 'Poné las palabras en orden.',
+    instr: 'Tocá las palabras en orden para armar la oración en chino.', render: renderOrder, makeRound: () => sample(SENTENCES, 6) },
+  { id: 'encontrar', name: 'Encontrar la palabra', color: 'lilac', desc: 'Buscá la palabra en chino que corresponde.',
+    instr: 'Buscá la palabra en chino que significa lo mismo.', render: renderFind, makeRound: () => sample(POOL, 8) },
+];
+
+/* =========================================================
+   7. PANTALLAS: INICIO Y FINAL
+   ========================================================= */
+function showHome() {
+  roundId++;
+  if ('speechSynthesis' in window) speechSynthesis.cancel();
+  const best = store.get('best', {});
+  $app.innerHTML = `
+    <header class="hero">
+      <div class="mascot">${lion(false)}</div>
+      <div class="hero-text">
+        <h1>Chino con León<span class="zh-title">你好！</span></h1>
+        <p>Elegí un juego para practicar las palabras de tu clase.</p>
+      </div>
+      ${pinyinChip()}
+    </header>
+    <main class="game-grid">
+      ${GAMES.map((g, i) => `
+        <article class="game-card" style="--tint:var(--${g.color})">
+          <div class="art">${ICONS[g.id]}</div>
+          <h2>${g.name}</h2>
+          <p>${g.desc}</p>
+          <div class="bottom">
+            ${best[g.id] ? starsHTML(best[g.id]) : '<span></span>'}
+            <button class="btn" data-start="${i}">¡Jugar!</button>
+          </div>
+        </article>`).join('')}
+    </main>
+    <p class="foot">${VOCAB.length} palabras del mazo “Clase León”</p>`;
+  $app.querySelectorAll('[data-start]').forEach(b => b.addEventListener('click', () => startGame(GAMES[+b.dataset.start])));
+  window.scrollTo(0, 0);
+}
+
+function showEnd(game, score, total, missed, isReview) {
+  roundId++;
+  const r = score / total, stars = r >= .9 ? 3 : r >= .6 ? 2 : 1;
+  if (!isReview) { const best = store.get('best', {}); best[game.id] = Math.max(best[game.id] || 0, stars); store.set('best', best); }
+  const note = stars === 3 ? '¡Sos un genio del chino!' : stars === 2 ? '¡Muy buen trabajo!' : '¡Bien! Practicando sale cada vez mejor.';
+  const reviewItem = q => q.zh ? `<li>${zhBlock(q.zh, q.py)} ${q.es}</li>`
+    : `<li>${q.es}</li>`;
+  $app.innerHTML = `
+    <div class="end pop" style="--tint:var(--${game.color})">
+      <div class="mascot">${lion(true)}</div>
+      <h2>¡Terminaste!</h2>
+      ${starsHTML(stars)}
+      <p class="score">Acertaste <b>${score}</b> de <b>${total}</b> a la primera</p>
+      <p class="note">${note}</p>
+      ${missed.length ? `<div class="review"><h3>Para repasar</h3><ul>${missed.map(reviewItem).join('')}</ul></div>` : ''}
+      <div class="end-actions">
+        ${missed.length ? '<button class="btn" data-review>Repasar las que fallé</button>' : ''}
+        <button class="btn ${missed.length ? 'btn-soft' : ''}" data-again>Jugar otra vez</button>
+        <button class="btn btn-soft" data-home>Volver al menú</button>
+      </div>
+    </div>`;
+  const rv = $app.querySelector('[data-review]');
+  if (rv) rv.addEventListener('click', () => startGame(game, shuffle(missed), true));
+  $app.querySelector('[data-again]').addEventListener('click', () => startGame(game));
+  window.scrollTo(0, 0);
+  confetti();
+}
+
+function confetti() {
+  if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const colors = ['#ffd3e0', '#fff0b3', '#cfe6ff', '#c8eed8', '#e2d8ff', '#f59f3a'];
+  for (let i = 0; i < 46; i++) {
+    const c = document.createElement('span');
+    c.className = 'confetti';
+    c.style.left = Math.random() * 100 + 'vw';
+    c.style.background = colors[i % colors.length];
+    c.style.setProperty('--dx', (Math.random() * 160 - 80) + 'px');
+    c.style.animationDuration = (1.8 + Math.random() * 1.6) + 's';
+    c.style.animationDelay = (Math.random() * .4) + 's';
+    document.body.appendChild(c);
+    setTimeout(() => c.remove(), 4200);
+  }
+}
+
+/* Para pruebas o para modificar desde la consola */
+window.ChinoLeon = { VOCAB, POOL, SENTENCES, FILL, GAMES, sentencePinyin, PY, distractors };
+
+showHome();
+</script>
+</body>
+</html>
